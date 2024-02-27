@@ -1,5 +1,3 @@
-resource "random_pet" "name" {}
-
 data "aws_ami" "linux" {
   most_recent = true
 
@@ -24,17 +22,17 @@ data "aws_ami" "linux" {
   }
 }
 
-resource "aws_security_group" "tf-k8s-worker-sec-gr" {
-  name = "k8s-worker-sec-gr"
+resource "aws_security_group" "tf-k8s-sec-gr" {
+  name = "tf-k8s-sec-gr"
   tags = {
-    Name = "k8s-worker-sec-gr"
+    Name = "tf-k8s-sec-gr"
   }
 
   ingress {
     from_port = 0
     protocol  = "-1"
     to_port   = 0
-    self = true
+    self      = true
   }
 
   ingress {
@@ -66,16 +64,37 @@ resource "aws_security_group" "tf-k8s-worker-sec-gr" {
   }
 }
 
-resource "aws_instance" "app_server" {
-  ami           = data.aws_ami.linux.id
-  instance_type = var.instance_type
-  key_name      = var.key_name
-  vpc_security_group_ids = [aws_security_group.tf-k8s-worker-sec-gr.id]
+resource "aws_instance" "master" {
+  ami                    = data.aws_ami.linux.id
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.tf-k8s-sec-gr.id]
 
-  user_data = file("init-script.sh")
+  user_data = file("master-init-script.sh")
 
   tags = {
-    Name = random_pet.name.id
+    Name = "k8s-master"
   }
 }
 
+resource "aws_instance" "worker" {
+  count                  = var.worker_count
+  ami                    = data.aws_ami.linux.id
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.tf-k8s-sec-gr.id]
+
+  user_data = templatefile(
+    "worker-init-script.tftpl",
+    {
+      region         = var.aws_region
+      master-id      = aws_instance.master.id
+      master-private = aws_instance.master.private_ip
+    }
+  )
+
+  tags = {
+    Name = "k8s-worker-${count.index + 1}"
+  }
+  depends_on = [aws_instance.master]
+}
