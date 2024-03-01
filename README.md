@@ -2,13 +2,6 @@
 
 Creating K8S cluster with EC2 instances
 
-## Troubleshooting
-
-Monitor installing tools with:
-
-```
-tail -f /var/log/cloud-init-output.log
-```
 
 ## Refs
 
