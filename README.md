@@ -4,11 +4,20 @@ Creating K8S cluster with EC2 instances
 
 ## Logs
 
-Master
+Follow logs from nodes:
 
 ```
 eval "$( tf output -raw master_ssh_command )"
 tf output -json worker_ssh_command | jq -r 'first' 
+```
+
+## Debugging 
+
+Recreate worker node
+
+```
+tf taint "aws_instance.worker[0]"
+tf apply -auto-approve
 ```
 
 ## Refs
