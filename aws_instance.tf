@@ -3,6 +3,7 @@ resource "aws_instance" "master" {
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.tf-k8s-sec-gr.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2sshprofile.name
 
   user_data = file("master-init-script.sh")
 
@@ -17,6 +18,7 @@ resource "aws_instance" "worker" {
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.tf-k8s-sec-gr.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2sshprofile.name
 
   user_data = templatefile(
     "worker-init-script.tftpl",
