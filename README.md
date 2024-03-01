@@ -2,13 +2,20 @@
 
 Creating K8S cluster with EC2 instances
 
-## Logs
+## Commands
 
-Follow logs from nodes:
+SSH:
 
 ```
-eval "$( tf output -raw master_ssh_command )"
-tf output -json worker_ssh_command | jq -r 'first' 
+eval "$( tf output -raw master_ssh )"
+eval "$( tf output -raw worker_ssh )"
+```
+
+Logs:
+
+```
+eval "$( tf output -raw master_logs )"
+tf output -json worker_logs | jq -r 'first' 
 ```
 
 ## Debugging 
