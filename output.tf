@@ -12,5 +12,5 @@ output "master_logs" {
 }
 
 output "worker_logs" {
-  value       = [for instance in aws_instance.worker : "ssh -i ~/.ssh/terraform.pem -o 'StrictHostKeyChecking no' ubuntu@${instance.public_ip} 'tail -f /var/log/cloud-init-output.log'"]
+  value       = "ssh -i ~/.ssh/terraform.pem -o 'StrictHostKeyChecking no' ubuntu@${aws_instance.worker[0].public_ip} 'tail -f /var/log/cloud-init-output.log'"
 }
