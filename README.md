@@ -18,15 +18,6 @@ eval "$( tf output -raw master_logs )"
 tf output -json worker_logs | jq -r 'first' 
 ```
 
-## Debugging 
-
-Recreate worker node
-
-```
-tf taint "aws_instance.worker[0]"
-tf apply -auto-approve
-```
-
 ## Refs
 
 - The original code from [Medium post](https://medium.com/@yakuphanbilgic3/project-creating-a-kubernetes-cluster-with-terraform-on-aws-6896f78e20ea)
